@@ -2,8 +2,7 @@
 #include "resource_manager.h"
 #include <iostream>
 
-Game::Game(unsigned int width, unsigned int height)
-    : State(GAME_MENU), Keys(), Width(width), Height(height) {} 
+Game::Game(unsigned int width, unsigned int height) : State(GAME_ACTIVE), Keys(), Width(width), Height(height) {}
 
 Game::~Game() {
     std::cout << "Attempting to delete Game Object" << std::endl;
@@ -20,6 +19,7 @@ Game::~Game() {
 }
 
 void Game::Init() {
+    CELL_SIZE = Height / 24.0;
     // load shaders
     std::cout << "Loading Shaders" << std::endl;
     ResourceManager::LoadShader("../shaders/sprite_vertex.glsl", "../shaders/sprite_fragment.glsl", nullptr, "sprite");
@@ -38,6 +38,7 @@ void Game::Init() {
     // load textures
     std::cout << "Loading Textures" << std::endl;
     ResourceManager::LoadTexture("../textures/block.png", false, "block");
+    ResourceManager::LoadTexture("../textures/solid.png", false, "solid");
     ResourceManager::LoadTexture("../textures/button.png", true, "button");
 
     // add menu buttons
@@ -54,6 +55,8 @@ void Game::ProcessInput(float dt) {}
 
 void Game::Render() {
     if (this->State == GAME_ACTIVE) {
+        Renderer->DrawSprite(ResourceManager::GetTexture("solid"), glm::vec2(2*CELL_SIZE),
+                             glm::vec2(10 * CELL_SIZE,20*CELL_SIZE), 0.0f, glm::vec3(0.0f));
     } else if (this->State == GAME_MENU) {
         for (ClickableObject button : buttons) {
             Renderer->DrawSprite(ResourceManager::GetTexture("button"), button.Position, button.Size, 0.0f);

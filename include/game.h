@@ -24,6 +24,7 @@ private:
     // Game-related State data
     SpriteRenderer* Renderer;
     TextRenderer* Text;
+    float CELL_SIZE;
 public:
     // game state
     GameState               State;	
