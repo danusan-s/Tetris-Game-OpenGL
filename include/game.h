@@ -3,16 +3,16 @@
 
 #include "clickable_object.h"
 #include "sprite_renderer.h"
-#include "text_renderer.h"
 #include "tetromino.h"
+#include "text_renderer.h"
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
 #include <vector>
 
 // Represents the current state of the game
-enum class GameState { GAME_ACTIVE, GAME_MENU, GAME_WIN };
+enum class GameState { GAME_ACTIVE, GAME_MENU, GAME_OVER };
 
-enum class BlockColor { NONE, RED, GREEN, BLUE};
+enum class BlockColor { NONE, RED, GREEN, BLUE, CYAN, PURPLE, YELLOW };
 
 // Game holds all game-related state and functionality.
 // Combines all game-related data into a single class for
@@ -23,15 +23,17 @@ class Game {
     SpriteRenderer* Renderer;
     TextRenderer* Text;
     Tetromino* CurrentTetromino;
+    Tetromino* NextTetromino;
+    ClickableObject* StartButton;
     float CELL_SIZE;
 
    public:
     // game state
     GameState State;
+    int Score;
     bool Keys[1024];
     float clickX, clickY;
     unsigned int Width, Height;
-    std::vector<ClickableObject> buttons;
     // constructor/destructor
     Game(unsigned int width, unsigned int height);
     ~Game();

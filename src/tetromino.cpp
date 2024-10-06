@@ -2,7 +2,7 @@
 
 // Constructor
 Tetromino::Tetromino(TetrominoType type, TetrominoColor color)
-    : Type(type), Color(color), RotationState(Rotation::DEG_0), Position(5, 20) {
+    : Type(type), Color(color), RotationState(Rotation::DEG_0), Position(4, 22) {
     InitShapeOffsets();
 }
 
@@ -49,10 +49,10 @@ void Tetromino::InitShapeOffsets() {
             break;
         case TetrominoType::O:
             ShapeOffsets = {
-                {{0, 0}, {1, 0}, {0, 1}, {1, 1}}, // 0° rotation (O is symmetric, all rotations are the same)
-                {{0, 0}, {1, 0}, {0, 1}, {1, 1}}, // 90° rotation
-                {{0, 0}, {1, 0}, {0, 1}, {1, 1}}, // 180° rotation
-                {{0, 0}, {1, 0}, {0, 1}, {1, 1}}  // 270° rotation
+                {{1, 0}, {2, 0}, {1, 1}, {2, 1}}, // 0° rotation (O is symmetric, all rotations are the same)
+                {{1, 0}, {2, 0}, {1, 1}, {2, 1}}, // 90° rotation
+                {{1, 0}, {2, 0}, {1, 1}, {2, 1}}, // 180° rotation
+                {{1, 0}, {2, 0}, {1, 1}, {2, 1}}  // 270° rotation
             };
             break;
         case TetrominoType::T:
