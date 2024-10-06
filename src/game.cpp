@@ -43,7 +43,7 @@ void Game::Init() {
     // set render-specific controls
     Renderer = new SpriteRenderer(ResourceManager::GetShader("sprite"));
     Text = new TextRenderer(this->Width, this->Height);
-    Text->Load("../HoodBrothers.ttf", 96);
+    Text->Load("../fonts/JetBrainsMonoNerdFont-Bold.ttf", 72);
 
     // load textures
     std::cout << "Loading Textures" << std::endl;
@@ -244,7 +244,7 @@ void Game::Render() {
 
         // Render next tetromino
 
-        BlockColor nextTetrominoColor = static_cast<BlockColor>(static_cast<int>(CurrentTetromino->Color) +
+        BlockColor nextTetrominoColor = static_cast<BlockColor>(static_cast<int>(NextTetromino->Color) +
                                                             1); // Assign the Tetromino's color to the grid
         Renderer->DrawSprite(ResourceManager::GetTexture("solid"), glm::vec2(620.0f,390.0f),
                              glm::vec2(260.0f), 0.0f, glm::vec3(1.0f));
@@ -265,7 +265,7 @@ void Game::Render() {
 
 
         if (this->State == GameState::GAME_OVER) {
-            Text->RenderText("GAME OVER", 500.0f, 500.0f, 2.0f);
+            Text->RenderText("GAME OVER", 500.0f, 500.0f, 2.0f,glm::vec3(0.8f));
         }
 
     } else if (this->State == GameState::GAME_MENU) {
