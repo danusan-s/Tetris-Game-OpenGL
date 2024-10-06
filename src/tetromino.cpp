@@ -1,7 +1,8 @@
 #include "tetromino.h"
 
 // Constructor
-Tetromino::Tetromino(TetrominoType type) : Type(type), RotationState(Rotation::DEG_0), Position(5, 24) {
+Tetromino::Tetromino(TetrominoType type, TetrominoColor color)
+    : Type(type), Color(color), RotationState(Rotation::DEG_0), Position(5, 20) {
     InitShapeOffsets();
 }
 
@@ -16,8 +17,16 @@ void Tetromino::MoveDown() {
     --Position.y;
 }
 
-void Tetromino::Rotate() {
-    // Cycle through the rotation states
+void Tetromino::MoveUp() {
+    ++Position.y;
+}
+
+void Tetromino::RotateClockwise() {
+    RotationState =
+        static_cast<Rotation>((static_cast<int>(RotationState) - 1) >= 0 ? static_cast<int>(RotationState) - 1 : 3);
+}
+
+void Tetromino::RotateAntiClockwise() {
     RotationState = static_cast<Rotation>((static_cast<int>(RotationState) + 1) % 4);
 }
 
