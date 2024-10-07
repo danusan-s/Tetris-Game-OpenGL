@@ -50,7 +50,6 @@ void Game::Init() {
     std::cout << "Loading Textures" << std::endl;
     ResourceManager::LoadTexture("../textures/tetris_block.jpg", false, "block");
     ResourceManager::LoadTexture("../textures/solid_block.png", false, "solid");
-    ResourceManager::LoadTexture("../textures/button.png", true, "button");
 
     SpawnTetromino();
 
