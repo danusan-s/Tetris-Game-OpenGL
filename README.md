@@ -6,6 +6,8 @@ A recreation of the classic tetris game using OpenGL for rendering, GLFW for win
 
 Works similar to regular tetris. This project simply serves to better understand basic rendering using tools like GLFW and FreeType.
 
+[Installation Guide](GUIDE.md)
+
 ### Controls:
 
 <ul>
