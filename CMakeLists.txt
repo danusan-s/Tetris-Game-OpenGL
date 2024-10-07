@@ -7,7 +7,6 @@ set(CMAKE_CXX_STANDARD 17)
 find_package(glfw3 3.3 REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(Freetype REQUIRED)
-find_package(GLM REQUIRED)
 
 # Collect all source files in src/ folder
 file(GLOB SOURCES "src/*.cpp" "src/*.c")
