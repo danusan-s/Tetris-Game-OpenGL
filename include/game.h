@@ -12,7 +12,7 @@
 // Represents the current state of the game
 enum class GameState { GAME_ACTIVE, GAME_MENU, GAME_OVER };
 
-enum class BlockColor { NONE, RED, GREEN, BLUE, CYAN, PURPLE, YELLOW };
+enum class BlockColor { NONE, RED, GREEN, BLUE, CYAN, PURPLE, YELLOW, ORANGE };
 
 // Game holds all game-related state and functionality.
 // Combines all game-related data into a single class for

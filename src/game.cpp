@@ -6,6 +6,7 @@ std::vector<std::vector<BlockColor>> grid(24, std::vector<BlockColor>(10, BlockC
 
 float fallTimeAccumulator = 0.0f;
 float moveTimeAccumulator = 0.0f;
+float flashTimer = 0.0f;
 
 Game::Game(unsigned int width, unsigned int height)
     : State(GameState::GAME_MENU), Keys(), Width(width), Height(height), Score(0) {}
@@ -54,20 +55,18 @@ void Game::Init() {
     SpawnTetromino();
 
     // add menu buttons
-    StartButton = new ClickableObject(glm::vec2(250, 350), glm::vec2(500, 100), 0);
+    StartButton = new ClickableObject(glm::vec2(250, 450), glm::vec2(500, 100), 0);
 }
 
 // Spawn a random Tetromino at the top of the grid
 void Game::SpawnTetromino() {
-    if (NextTetromino==nullptr){
-        TetrominoType randomType = static_cast<TetrominoType>(rand() % 7);    // Random type between 0 and 6
-        TetrominoColor randomColor = static_cast<TetrominoColor>(rand() % 6); // Random color R or G or B
-        NextTetromino = new Tetromino(randomType, randomColor);            // Spawn new Tetromino
+    if (NextTetromino == nullptr) {
+        TetrominoType randomType = static_cast<TetrominoType>(rand() % 7); // Random type between 0 and 6
+        NextTetromino = new Tetromino(randomType);                         // Spawn new Tetromino
     }
     CurrentTetromino = NextTetromino;
-    TetrominoType randomType = static_cast<TetrominoType>(rand() % 7);    // Random type between 0 and 6
-    TetrominoColor randomColor = static_cast<TetrominoColor>(rand() % 6); // Random color R or G or B
-    NextTetromino = new Tetromino(randomType, randomColor);            // Spawn new Tetromino
+    TetrominoType randomType = static_cast<TetrominoType>(rand() % 7); // Random type between 0 and 6
+    NextTetromino = new Tetromino(randomType);                         // Spawn new Tetromino
     if (CheckCollision(CurrentTetromino)) {
         // We cannot spawn piece
         this->State = GameState::GAME_OVER;
@@ -111,7 +110,7 @@ void Game::FixTetrominoToGrid() {
     for (auto block : CurrentTetromino->GetCurrentShape()) {
         int gridX = static_cast<int>(CurrentTetromino->Position.x + block.x);
         int gridY = static_cast<int>(CurrentTetromino->Position.y + block.y);
-        grid[gridY][gridX] = static_cast<BlockColor>(static_cast<int>(CurrentTetromino->Color) +
+        grid[gridY][gridX] = static_cast<BlockColor>(static_cast<int>(CurrentTetromino->Type) +
                                                      1); // Assign the Tetromino's color to the grid
     }
     delete CurrentTetromino; // Clean up the current Tetromino
@@ -129,6 +128,7 @@ void Game::ClearCompletedRows() {
             }
         }
         if (completed) {
+            flashTimer = 0.5f;
             Score += combo * 50;
             ++combo;
             for (int row = i; row < 23; ++row) {
@@ -142,6 +142,9 @@ void Game::ClearCompletedRows() {
 
 void Game::ProcessInput(float dt) {
     moveTimeAccumulator += dt;
+    if (flashTimer > 0.0f) {
+        flashTimer -= dt;
+    }
     if (moveTimeAccumulator >= 0.1f) {
         moveTimeAccumulator = 0.0f;
         if (this->State == GameState::GAME_ACTIVE) {
@@ -202,6 +205,8 @@ glm::vec3 getColor(BlockColor color) {
             return glm::vec3(1.0f, 0.0f, 1.0f);
         case BlockColor::YELLOW:
             return glm::vec3(1.0f, 1.0f, 0.0f);
+        case BlockColor::ORANGE:
+            return glm::vec3(1.0f, 0.5f, 0.0f);
         default:
             return glm::vec3(1.0f);
     }
@@ -212,7 +217,8 @@ void Game::Render() {
     if (this->State == GameState::GAME_ACTIVE || this->State == GameState::GAME_OVER) {
         // Draw play area with a frame
         Renderer->DrawSprite(ResourceManager::GetTexture("solid"), glm::vec2(1.8 * CELL_SIZE),
-                             glm::vec2(10.4 * CELL_SIZE, 24.4 * CELL_SIZE), 0.0f, glm::vec3(1.0f));
+                             glm::vec2(10.4 * CELL_SIZE, 24.4 * CELL_SIZE), 0.0f,
+                             flashTimer > 0.0f ? glm::vec3(1.0f, 0.0f, 0.0f) : glm::vec3(1.0f));
         Renderer->DrawSprite(ResourceManager::GetTexture("solid"), glm::vec2(2 * CELL_SIZE),
                              glm::vec2(10 * CELL_SIZE, 24 * CELL_SIZE), 0.0f, glm::vec3(0.0f));
 
@@ -229,8 +235,8 @@ void Game::Render() {
 
         // Render current tetromino
 
-        BlockColor currTetrominoColor = static_cast<BlockColor>(static_cast<int>(CurrentTetromino->Color) +
-                                                            1); // Assign the Tetromino's color to the grid
+        BlockColor currTetrominoColor = static_cast<BlockColor>(static_cast<int>(CurrentTetromino->Type) +
+                                                                1); // Assign the Tetromino's color to the grid
         for (auto block : CurrentTetromino->GetCurrentShape()) {
             int gridX = static_cast<int>(CurrentTetromino->Position.x + block.x);
             int gridY = static_cast<int>(CurrentTetromino->Position.y + block.y);
@@ -244,42 +250,41 @@ void Game::Render() {
 
         // Render next tetromino
 
-        BlockColor nextTetrominoColor = static_cast<BlockColor>(static_cast<int>(NextTetromino->Color) +
-                                                            1); // Assign the Tetromino's color to the grid
-        Renderer->DrawSprite(ResourceManager::GetTexture("solid"), glm::vec2(620.0f,390.0f),
-                             glm::vec2(260.0f), 0.0f, glm::vec3(1.0f));
-        Renderer->DrawSprite(ResourceManager::GetTexture("solid"), glm::vec2(630.0f,400.0f),
-                             glm::vec2(240.0f), 0.0f, glm::vec3(0.0f));
-        
+        BlockColor nextTetrominoColor = static_cast<BlockColor>(static_cast<int>(NextTetromino->Type) +
+                                                                1); // Assign the Tetromino's color to the grid
+        Renderer->DrawSprite(ResourceManager::GetTexture("solid"), glm::vec2(620.0f, 390.0f), glm::vec2(260.0f), 0.0f,
+                             glm::vec3(1.0f));
+        Renderer->DrawSprite(ResourceManager::GetTexture("solid"), glm::vec2(630.0f, 400.0f), glm::vec2(240.0f), 0.0f,
+                             glm::vec3(0.0f));
+
         for (auto block : NextTetromino->GetCurrentShape()) {
-            int posX = static_cast<int>(670.0f + block.x*40.0f);
-            int posY = static_cast<int>(480.0f + block.y*40.0f);
-            //Center the 3 wide piece
-            if (NextTetromino->Type != TetrominoType::I && NextTetromino->Type != TetrominoType::O){
+            int posX = static_cast<int>(670.0f + block.x * 40.0f);
+            int posY = static_cast<int>(480.0f + block.y * 40.0f);
+            // Center the 3 wide piece
+            if (NextTetromino->Type != TetrominoType::I && NextTetromino->Type != TetrominoType::O) {
                 posX += 20.0f;
             }
-            Renderer->DrawSprite(ResourceManager::GetTexture("block"),
-                                 glm::vec2(posX,posY),
-                                 glm::vec2(40.0f), 0.0f, getColor(nextTetrominoColor));
+            Renderer->DrawSprite(ResourceManager::GetTexture("block"), glm::vec2(posX, posY), glm::vec2(40.0f), 0.0f,
+                                 getColor(nextTetrominoColor));
         }
 
-
         if (this->State == GameState::GAME_OVER) {
-            Text->RenderText("GAME OVER", 500.0f, 500.0f, 2.0f,glm::vec3(0.8f));
+            Text->RenderText("GAME OVER", 500.0f, 500.0f, 2.0f, glm::vec3(0.8f));
         }
 
     } else if (this->State == GameState::GAME_MENU) {
-        Renderer->DrawSprite(ResourceManager::GetTexture("button"), StartButton->Position, StartButton->Size, 0.0f);
-        Text->RenderText("TETRIS", 500.0f, 200.0f, 1.0f);
-        Text->RenderText("Start game", 500.0f, 400.0f, 0.5f, glm::vec3(1.0f));
+        Renderer->DrawSprite(ResourceManager::GetTexture("solid"), StartButton->Position, StartButton->Size, 0.0f,
+                             glm::vec3(1.0f));
+        Text->RenderText("TETRIS", 500.0f, 200.0f, 2.0f);
+        Text->RenderText("Start game", 500.0f, 500.0f, 0.5f, glm::vec3(0.0f));
     }
 }
 
 void Game::ResetGame() {
     // Clear the score and grid
     this->Score = 0;
-    for (int i=0;i<24;++i){
-        for (int j=0;j<10;++j){
+    for (int i = 0; i < 24; ++i) {
+        for (int j = 0; j < 10; ++j) {
             grid[i][j] = BlockColor::NONE;
         }
     }
