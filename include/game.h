@@ -5,8 +5,8 @@
 #include "sprite_renderer.h"
 #include "tetromino.h"
 #include "text_renderer.h"
+#include "glad.h"
 #include <GLFW/glfw3.h>
-#include <glad/glad.h>
 #include <vector>
 
 // Represents the current state of the game

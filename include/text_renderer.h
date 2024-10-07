@@ -3,7 +3,7 @@
 
 #include <map>
 
-#include <glad/glad.h>
+#include "glad.h"
 #include <glm/glm.hpp>
 
 #include "texture.h"
