@@ -12,7 +12,7 @@ Before compiling the game, ensure you have the following dependencies installed:
 
 - **On Linux (Ubuntu/Debian)**:
   ```bash
-  sudo apt-get install cmake libglfw3-dev libfreetype6-dev libglew-dev
+  sudo apt-get install cmake libglfw3-dev libfreetype6-dev libglew-dev libglm-dev
   ```
 
 - **On Windows**:
@@ -20,12 +20,12 @@ Before compiling the game, ensure you have the following dependencies installed:
 
   For example, using vcpkg:
     ```
-    vcpkg install glfw3 freetype
+    vcpkg install glfw3 freetype glm
     ```
 
 - **On MacOS**:
   ```
-  brew install cmake glfw freetype
+  brew install cmake glfw freetype glm
   ```
 
 ## 2. Clone the repository:
