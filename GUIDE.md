@@ -32,8 +32,8 @@ Before compiling the game, ensure you have the following dependencies installed:
 
 Clone the repository to your device from github.
 ```
-git clone https://github.com/yourusername/tetris-game.git
-cd tetris-game
+git clone https://github.com/danusan-s/Tetris-Game-OpenGL.git
+cd Tetris-Game-OpenGL
 ```
 
 ## 3. Configure the build with CMake:
