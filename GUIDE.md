@@ -16,17 +16,17 @@ Before compiling the game, ensure you have the following dependencies installed:
   ```
 
 - **On Windows**:
-Use a package manager like vcpkg or MSYS2 to install GLFW and FreeType, or download and build them manually.
+  Use a package manager like vcpkg or MSYS2 to install GLFW and FreeType, or download and build them manually.
 
-For example, using vcpkg:
-  ```
-  vcpkg install glfw3 freetype
-  ```
+  For example, using vcpkg:
+    ```
+    vcpkg install glfw3 freetype
+    ```
 
 - **On MacOS**:
-```
-brew install cmake glfw freetype
-```
+  ```
+  brew install cmake glfw freetype
+  ```
 
 ## 2. Clone the repository:
 
@@ -49,26 +49,26 @@ cmake ..
 Once Cmake is configured inside the build folder, the next step is to build it.
 
 - **On Linux/MacOS:**
-```
-make
-```
+  ```
+  make
+  ```
 
 - **On Windows:**
-```
-cmake --build . --config Release
-```
+  ```
+  cmake --build . --config Release
+  ```
 
 ## 5. Run the game:
 
 Once the build is successful, you can run the game.
 
 - **On Linux/MacOS:**
-```
-./TetrisGame
-```
+  ```
+  ./TetrisGame
+  ```
 
 - **On Windows:**
-```
-./Release/TetrisGame.exe
-```
+  ```
+  ./Release/TetrisGame.exe
+  ```
 
