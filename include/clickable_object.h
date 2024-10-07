@@ -8,9 +8,12 @@ class ClickableObject{
     public:
         ClickableObject(glm::vec2 posn,glm::vec2 size,unsigned int function);
         ~ClickableObject();
-        glm::vec2 Position,Size;
+        glm::vec2 CenterPosition,OriginalSize;
+        glm::vec2 Position, Size;
         unsigned int id;
         bool isClicked(float x,float y);
+        void changeScale(float scale);
+        bool clicked;
 };
 #endif
 

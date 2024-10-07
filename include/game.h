@@ -33,6 +33,7 @@ class Game {
     int Score;
     bool Keys[1024];
     float clickX, clickY;
+    float releaseX, releaseY;
     unsigned int Width, Height;
     // constructor/destructor
     Game(unsigned int width, unsigned int height);

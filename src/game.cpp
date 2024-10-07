@@ -55,7 +55,7 @@ void Game::Init() {
     SpawnTetromino();
 
     // add menu buttons
-    StartButton = new ClickableObject(glm::vec2(250, 450), glm::vec2(500, 100), 0);
+    StartButton = new ClickableObject(glm::vec2(500, 500), glm::vec2(500, 100), 0);
 }
 
 // Spawn a random Tetromino at the top of the grid
@@ -186,7 +186,19 @@ void Game::ProcessInput(float dt) {
     }
     if (this->State == GameState::GAME_MENU) {
         if (StartButton->isClicked(clickX, clickY)) {
-            this->State = GameState::GAME_ACTIVE;
+            StartButton->clicked = true;
+            StartButton->changeScale(0.8f);
+            clickX = -1;
+            clickY = -1;
+        }
+        if (releaseX > 0 && releaseY > 0) {
+            if (StartButton->isClicked(releaseX, releaseY) && StartButton->clicked) {
+                this->State = GameState::GAME_ACTIVE;
+            }
+            StartButton->changeScale(1.0f);
+            StartButton->clicked = false;
+            releaseX = -1;
+            releaseY = -1;
         }
     }
 }
@@ -217,7 +229,7 @@ void Game::Render() {
     if (this->State == GameState::GAME_ACTIVE || this->State == GameState::GAME_OVER) {
         // Draw play area with a frame
         Renderer->DrawSprite(ResourceManager::GetTexture("solid"), glm::vec2(1.8 * CELL_SIZE),
-                             glm::vec2(10.4 * CELL_SIZE, 24.4 * CELL_SIZE), 0.0f,
+                             glm::vec2(10.4* CELL_SIZE, 24.4 * CELL_SIZE), 0.0f,
                              flashTimer > 0.0f ? glm::vec3(1.0f, 0.0f, 0.0f) : glm::vec3(1.0f));
         Renderer->DrawSprite(ResourceManager::GetTexture("solid"), glm::vec2(2 * CELL_SIZE),
                              glm::vec2(10 * CELL_SIZE, 24 * CELL_SIZE), 0.0f, glm::vec3(0.0f));

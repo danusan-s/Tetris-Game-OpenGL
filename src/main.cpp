@@ -108,7 +108,14 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
     if (button == GLFW_MOUSE_BUTTON_LEFT && (action == GLFW_PRESS || action == GLFW_RELEASE)) {
         double xPos, yPos;
         glfwGetCursorPos(window, &xPos, &yPos);
-        Tetris.clickX = xPos;
-        Tetris.clickY = yPos;
+        if (action==GLFW_PRESS){
+            Tetris.clickX = xPos;
+            Tetris.clickY = yPos;
+        }
+        else{
+            Tetris.releaseX = xPos;
+            Tetris.releaseY = yPos;
+        }
     }
+
 }
