@@ -32,12 +32,12 @@ class Game {
 
    public:
     // game state
-    GameState state;
-    int score;
-    bool keys[1024];
-    float clickX, clickY;
-    float releaseX, releaseY;
-    unsigned int width, height;
+    GameState State;
+    int Score;
+    bool Keys[1024];
+    float ClickX, ClickY;
+    float ReleaseX, ReleaseY;
+    unsigned int Width, Height;
     // constructor/destructor
     Game(unsigned int width, unsigned int height);
     ~Game();

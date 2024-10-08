@@ -9,7 +9,7 @@ float moveTimeAccumulator = 0.0f;
 float flashTimer = 0.0f;
 
 Game::Game(unsigned int width, unsigned int height)
-    : state(GameState::GAME_MENU), keys(), width(width), height(height), score(0) {
+    : State(GameState::GAME_MENU), Keys(), Width(width), Height(height), Score(0) {
     int rowCellCount = 24;
     int colCellCount = 10;
     float borderCellRatio = 0.4f;
@@ -31,7 +31,7 @@ Game::~Game() {
 }
 
 void Game::Init() {
-    CELL_SIZE = height / 28.0;
+    CELL_SIZE = Height / 28.0;
 
     // Seed the random number generator
     srand(static_cast<unsigned int>(time(0)));
@@ -42,13 +42,13 @@ void Game::Init() {
 
     // configure shaders
     glm::mat4 projection =
-        glm::ortho(0.0f, static_cast<float>(this->width), static_cast<float>(this->height), 0.0f, -1.0f, 1.0f);
+        glm::ortho(0.0f, static_cast<float>(this->Width), static_cast<float>(this->Height), 0.0f, -1.0f, 1.0f);
     ResourceManager::GetShader("sprite").Use().SetInteger("image", 0);
     ResourceManager::GetShader("sprite").SetMatrix4("projection", projection);
 
     // set render-specific controls
     renderer = new SpriteRenderer(ResourceManager::GetShader("sprite"));
-    text = new TextRenderer(this->width, this->height);
+    text = new TextRenderer(this->Width, this->Height);
     text->Load("../fonts/JetBrainsMonoNerdFont-Bold.ttf", 72);
 
     // load textures
@@ -73,12 +73,12 @@ void Game::SpawnTetromino() {
     nextTetromino = new Tetromino(randomType);                         // Spawn new Tetromino
     if (CheckCollision(currentTetromino)) {
         // We cannot spawn piece
-        this->state = GameState::GAME_OVER;
+        this->State = GameState::GAME_OVER;
     }
 }
 
 void Game::Update(float dt) {
-    if (this->state == GameState::GAME_ACTIVE) {
+    if (this->State == GameState::GAME_ACTIVE) {
         fallTimeAccumulator += dt;
         if (fallTimeAccumulator >= 0.5f) {
             fallTimeAccumulator = 0.0f;
@@ -133,7 +133,7 @@ void Game::ClearCompletedRows() {
         }
         if (completed) {
             flashTimer = 0.5f;
-            score += combo * 50;
+            Score += combo * 50;
             ++combo;
             for (int row = i; row < 23; ++row) {
                 for (int col = 0; col < 10; ++col) {
@@ -151,58 +151,58 @@ void Game::ProcessInput(float dt) {
     }
     if (moveTimeAccumulator >= 0.1f) {
         moveTimeAccumulator = 0.0f;
-        if (this->state == GameState::GAME_ACTIVE) {
-            if (keys['A']) {
+        if (this->State == GameState::GAME_ACTIVE) {
+            if (Keys['A']) {
                 currentTetromino->MoveLeft();
                 if (CheckCollision(currentTetromino)) {
                     currentTetromino->MoveRight(); // Revert move if there's a collision
                 }
             }
-            if (keys['D']) {
+            if (Keys['D']) {
                 currentTetromino->MoveRight();
                 if (CheckCollision(currentTetromino)) {
                     currentTetromino->MoveLeft(); // Revert move if there's a collision
                 }
             }
-            if (keys['S']) {
+            if (Keys['S']) {
                 currentTetromino->MoveDown();
                 if (CheckCollision(currentTetromino)) {
                     currentTetromino->MoveUp(); // Revert move if there's a collision
                 }
             }
-            if (keys['E']) {
+            if (Keys['E']) {
                 currentTetromino->RotateClockwise();
                 if (CheckCollision(currentTetromino)) {
                     // Revert rotation if collision happens
                     currentTetromino->RotateAntiClockwise();
                 }
-                keys['E'] = false;
+                Keys['E'] = false;
             }
-            if (keys['Q']) {
+            if (Keys['Q']) {
                 currentTetromino->RotateAntiClockwise();
                 if (CheckCollision(currentTetromino)) {
                     // Revert rotation if collision happens
                     currentTetromino->RotateClockwise();
                 }
-                keys['Q'] = false;
+                Keys['Q'] = false;
             }
         }
     }
-    if (this->state == GameState::GAME_MENU) {
-        if (startButton->isClicked(clickX, clickY)) {
-            startButton->clicked = true;
-            startButton->changeScale(0.8f);
-            clickX = -1;
-            clickY = -1;
+    if (this->State == GameState::GAME_MENU) {
+        if (startButton->CheckClickPos(ClickX, ClickY)) {
+            startButton->Clicked = true;
+            startButton->ChangeScale(0.8f);
+            ClickX = -1;
+            ClickY = -1;
         }
-        if (releaseX > 0 && releaseY > 0) {
-            if (startButton->isClicked(releaseX, releaseY) && startButton->clicked) {
-                this->state = GameState::GAME_ACTIVE;
+        if (ReleaseX > 0 && ReleaseY > 0) {
+            if (startButton->CheckClickPos(ReleaseX, ReleaseY) && startButton->Clicked) {
+                this->State = GameState::GAME_ACTIVE;
             }
-            startButton->changeScale(1.0f);
-            startButton->clicked = false;
-            releaseX = -1;
-            releaseY = -1;
+            startButton->ChangeScale(1.0f);
+            startButton->Clicked = false;
+            ReleaseX = -1;
+            ReleaseY = -1;
         }
     }
 }
@@ -230,7 +230,7 @@ glm::vec3 getColor(BlockColor color) {
 }
 
 void Game::Render() {
-    if (this->state == GameState::GAME_ACTIVE || this->state == GameState::GAME_OVER) {
+    if (this->State == GameState::GAME_ACTIVE || this->State == GameState::GAME_OVER) {
         // Draw play area with a frame
         renderer->DrawSprite(
             ResourceManager::GetTexture("solid"), glm::vec2(1.8 * CELL_SIZE),
@@ -263,8 +263,8 @@ void Game::Render() {
                                  glm::vec2(CELL_SIZE), 0.0f, getColor(currTetrominoColor));
         }
 
-        // Render score
-        text->RenderText("score: " + std::to_string(score), 750.0f, 200.0f, 1.0f);
+        // Render Score
+        text->RenderText("Score: " + std::to_string(Score), 750.0f, 200.0f, 1.0f);
 
         // Render next tetromino
 
@@ -286,11 +286,11 @@ void Game::Render() {
                                  getColor(nextTetrominoColor));
         }
 
-        if (this->state == GameState::GAME_OVER) {
+        if (this->State == GameState::GAME_OVER) {
             text->RenderText("GAME OVER", 500.0f, 500.0f, 2.0f, glm::vec3(0.8f));
         }
 
-    } else if (this->state == GameState::GAME_MENU) {
+    } else if (this->State == GameState::GAME_MENU) {
         renderer->DrawSprite(ResourceManager::GetTexture("solid"), startButton->Position, startButton->Size, 0.0f,
                              glm::vec3(1.0f));
         text->RenderText("TETRIS", 500.0f, 200.0f, 2.0f);
@@ -299,12 +299,12 @@ void Game::Render() {
 }
 
 void Game::ResetGame() {
-    // Clear the score and grid
-    this->score = 0;
+    // Clear the Score and grid
+    this->Score = 0;
     for (int i = 0; i < 24; ++i) {
         for (int j = 0; j < 10; ++j) {
             grid[i][j] = BlockColor::NONE;
         }
     }
-    this->state = GameState::GAME_MENU;
+    this->State = GameState::GAME_MENU;
 }
