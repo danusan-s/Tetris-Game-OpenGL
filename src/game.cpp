@@ -26,7 +26,7 @@ Game::~Game() {
 }
 
 void Game::Init() {
-    CELL_SIZE = static_cast<float>(Height) / rowCellCount+(2*paddingCellRatio);
+    CELL_SIZE = static_cast<float>(Height) / (rowCellCount+(2*paddingCellRatio));
 
     // Seed the random number generator
     srand(static_cast<unsigned int>(time(0)));
