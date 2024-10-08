@@ -20,21 +20,24 @@ enum class BlockColor { NONE, RED, GREEN, BLUE, CYAN, PURPLE, YELLOW, ORANGE };
 class Game {
    private:
     // Game-related State data
-    SpriteRenderer* Renderer;
-    TextRenderer* Text;
-    Tetromino* CurrentTetromino;
-    Tetromino* NextTetromino;
-    ClickableObject* StartButton;
+    SpriteRenderer* renderer;
+    TextRenderer* text;
+    Tetromino* currentTetromino;
+    Tetromino* nextTetromino;
+    ClickableObject* startButton;
+    int rowCellCount, colCellCount;
+    float borderCellRatio, paddingCellRatio;
+    glm::vec3 flashColor;
     float CELL_SIZE;
 
    public:
     // game state
-    GameState State;
-    int Score;
-    bool Keys[1024];
+    GameState state;
+    int score;
+    bool keys[1024];
     float clickX, clickY;
     float releaseX, releaseY;
-    unsigned int Width, Height;
+    unsigned int width, height;
     // constructor/destructor
     Game(unsigned int width, unsigned int height);
     ~Game();

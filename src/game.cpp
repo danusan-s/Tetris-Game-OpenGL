@@ -9,24 +9,29 @@ float moveTimeAccumulator = 0.0f;
 float flashTimer = 0.0f;
 
 Game::Game(unsigned int width, unsigned int height)
-    : State(GameState::GAME_MENU), Keys(), Width(width), Height(height), Score(0) {}
+    : state(GameState::GAME_MENU), keys(), width(width), height(height), score(0) {
+    int rowCellCount = 24;
+    int colCellCount = 10;
+    float borderCellRatio = 0.4f;
+    float paddingCellRatio = 2.0f;
+}
 
 Game::~Game() {
     std::cout << "Attempting to delete Game Object" << std::endl;
 
-    delete Renderer;
-    Renderer = nullptr;
-    std::cout << "Deleted Renderer\n";
+    delete renderer;
+    renderer = nullptr;
+    std::cout << "Deleted renderer\n";
 
-    delete Text;
-    Text = nullptr;
-    std::cout << "Deleted Text\n";
+    delete text;
+    text = nullptr;
+    std::cout << "Deleted text\n";
 
     std::cout << "Game Object successfully deleted" << std::endl;
 }
 
 void Game::Init() {
-    CELL_SIZE = Height / 28.0;
+    CELL_SIZE = height / 28.0;
 
     // Seed the random number generator
     srand(static_cast<unsigned int>(time(0)));
@@ -37,51 +42,51 @@ void Game::Init() {
 
     // configure shaders
     glm::mat4 projection =
-        glm::ortho(0.0f, static_cast<float>(this->Width), static_cast<float>(this->Height), 0.0f, -1.0f, 1.0f);
+        glm::ortho(0.0f, static_cast<float>(this->width), static_cast<float>(this->height), 0.0f, -1.0f, 1.0f);
     ResourceManager::GetShader("sprite").Use().SetInteger("image", 0);
     ResourceManager::GetShader("sprite").SetMatrix4("projection", projection);
 
     // set render-specific controls
-    Renderer = new SpriteRenderer(ResourceManager::GetShader("sprite"));
-    Text = new TextRenderer(this->Width, this->Height);
-    Text->Load("../fonts/JetBrainsMonoNerdFont-Bold.ttf", 72);
+    renderer = new SpriteRenderer(ResourceManager::GetShader("sprite"));
+    text = new TextRenderer(this->width, this->height);
+    text->Load("../fonts/JetBrainsMonoNerdFont-Bold.ttf", 72);
 
     // load textures
-    std::cout << "Loading Textures" << std::endl;
+    std::cout << "Loading textures" << std::endl;
     ResourceManager::LoadTexture("../textures/tetris_block.jpg", false, "block");
     ResourceManager::LoadTexture("../textures/solid_block.png", false, "solid");
 
     SpawnTetromino();
 
     // add menu buttons
-    StartButton = new ClickableObject(glm::vec2(500, 500), glm::vec2(500, 100), 0);
+    startButton = new ClickableObject(glm::vec2(500, 500), glm::vec2(500, 100), 0);
 }
 
 // Spawn a random Tetromino at the top of the grid
 void Game::SpawnTetromino() {
-    if (NextTetromino == nullptr) {
+    if (nextTetromino == nullptr) {
         TetrominoType randomType = static_cast<TetrominoType>(rand() % 7); // Random type between 0 and 6
-        NextTetromino = new Tetromino(randomType);                         // Spawn new Tetromino
+        nextTetromino = new Tetromino(randomType);                         // Spawn new Tetromino
     }
-    CurrentTetromino = NextTetromino;
+    currentTetromino = nextTetromino;
     TetrominoType randomType = static_cast<TetrominoType>(rand() % 7); // Random type between 0 and 6
-    NextTetromino = new Tetromino(randomType);                         // Spawn new Tetromino
-    if (CheckCollision(CurrentTetromino)) {
+    nextTetromino = new Tetromino(randomType);                         // Spawn new Tetromino
+    if (CheckCollision(currentTetromino)) {
         // We cannot spawn piece
-        this->State = GameState::GAME_OVER;
+        this->state = GameState::GAME_OVER;
     }
 }
 
 void Game::Update(float dt) {
-    if (this->State == GameState::GAME_ACTIVE) {
+    if (this->state == GameState::GAME_ACTIVE) {
         fallTimeAccumulator += dt;
         if (fallTimeAccumulator >= 0.5f) {
             fallTimeAccumulator = 0.0f;
             // Game logic (moving, checking for collisions, etc.)
-            CurrentTetromino->MoveDown(); // Move the Tetromino down if no collision
-            if (CheckCollision(CurrentTetromino)) {
+            currentTetromino->MoveDown(); // Move the Tetromino down if no collision
+            if (CheckCollision(currentTetromino)) {
                 // Fix the Tetromino to the grid and spawn a new one
-                CurrentTetromino->MoveUp();
+                currentTetromino->MoveUp();
                 FixTetrominoToGrid();
                 ClearCompletedRows();
                 SpawnTetromino();
@@ -106,14 +111,14 @@ bool Game::CheckCollision(Tetromino* tetromino) {
 
 void Game::FixTetrominoToGrid() {
     // Fix the current Tetromino's blocks into the grid
-    for (auto block : CurrentTetromino->GetCurrentShape()) {
-        int gridX = static_cast<int>(CurrentTetromino->Position.x + block.x);
-        int gridY = static_cast<int>(CurrentTetromino->Position.y + block.y);
-        grid[gridY][gridX] = static_cast<BlockColor>(static_cast<int>(CurrentTetromino->Type) +
+    for (auto block : currentTetromino->GetCurrentShape()) {
+        int gridX = static_cast<int>(currentTetromino->Position.x + block.x);
+        int gridY = static_cast<int>(currentTetromino->Position.y + block.y);
+        grid[gridY][gridX] = static_cast<BlockColor>(static_cast<int>(currentTetromino->Type) +
                                                      1); // Assign the Tetromino's color to the grid
     }
-    delete CurrentTetromino; // Clean up the current Tetromino
-    CurrentTetromino = nullptr;
+    delete currentTetromino; // Clean up the current Tetromino
+    currentTetromino = nullptr;
 }
 
 void Game::ClearCompletedRows() {
@@ -128,7 +133,7 @@ void Game::ClearCompletedRows() {
         }
         if (completed) {
             flashTimer = 0.5f;
-            Score += combo * 50;
+            score += combo * 50;
             ++combo;
             for (int row = i; row < 23; ++row) {
                 for (int col = 0; col < 10; ++col) {
@@ -146,56 +151,56 @@ void Game::ProcessInput(float dt) {
     }
     if (moveTimeAccumulator >= 0.1f) {
         moveTimeAccumulator = 0.0f;
-        if (this->State == GameState::GAME_ACTIVE) {
-            if (Keys['A']) {
-                CurrentTetromino->MoveLeft();
-                if (CheckCollision(CurrentTetromino)) {
-                    CurrentTetromino->MoveRight(); // Revert move if there's a collision
+        if (this->state == GameState::GAME_ACTIVE) {
+            if (keys['A']) {
+                currentTetromino->MoveLeft();
+                if (CheckCollision(currentTetromino)) {
+                    currentTetromino->MoveRight(); // Revert move if there's a collision
                 }
             }
-            if (Keys['D']) {
-                CurrentTetromino->MoveRight();
-                if (CheckCollision(CurrentTetromino)) {
-                    CurrentTetromino->MoveLeft(); // Revert move if there's a collision
+            if (keys['D']) {
+                currentTetromino->MoveRight();
+                if (CheckCollision(currentTetromino)) {
+                    currentTetromino->MoveLeft(); // Revert move if there's a collision
                 }
             }
-            if (Keys['S']) {
-                CurrentTetromino->MoveDown();
-                if (CheckCollision(CurrentTetromino)) {
-                    CurrentTetromino->MoveUp(); // Revert move if there's a collision
+            if (keys['S']) {
+                currentTetromino->MoveDown();
+                if (CheckCollision(currentTetromino)) {
+                    currentTetromino->MoveUp(); // Revert move if there's a collision
                 }
             }
-            if (Keys['E']) {
-                CurrentTetromino->RotateClockwise();
-                if (CheckCollision(CurrentTetromino)) {
+            if (keys['E']) {
+                currentTetromino->RotateClockwise();
+                if (CheckCollision(currentTetromino)) {
                     // Revert rotation if collision happens
-                    CurrentTetromino->RotateAntiClockwise();
+                    currentTetromino->RotateAntiClockwise();
                 }
-                Keys['E'] = false;
+                keys['E'] = false;
             }
-            if (Keys['Q']) {
-                CurrentTetromino->RotateAntiClockwise();
-                if (CheckCollision(CurrentTetromino)) {
+            if (keys['Q']) {
+                currentTetromino->RotateAntiClockwise();
+                if (CheckCollision(currentTetromino)) {
                     // Revert rotation if collision happens
-                    CurrentTetromino->RotateClockwise();
+                    currentTetromino->RotateClockwise();
                 }
-                Keys['Q'] = false;
+                keys['Q'] = false;
             }
         }
     }
-    if (this->State == GameState::GAME_MENU) {
-        if (StartButton->isClicked(clickX, clickY)) {
-            StartButton->clicked = true;
-            StartButton->changeScale(0.8f);
+    if (this->state == GameState::GAME_MENU) {
+        if (startButton->isClicked(clickX, clickY)) {
+            startButton->clicked = true;
+            startButton->changeScale(0.8f);
             clickX = -1;
             clickY = -1;
         }
         if (releaseX > 0 && releaseY > 0) {
-            if (StartButton->isClicked(releaseX, releaseY) && StartButton->clicked) {
-                this->State = GameState::GAME_ACTIVE;
+            if (startButton->isClicked(releaseX, releaseY) && startButton->clicked) {
+                this->state = GameState::GAME_ACTIVE;
             }
-            StartButton->changeScale(1.0f);
-            StartButton->clicked = false;
+            startButton->changeScale(1.0f);
+            startButton->clicked = false;
             releaseX = -1;
             releaseY = -1;
         }
@@ -225,20 +230,22 @@ glm::vec3 getColor(BlockColor color) {
 }
 
 void Game::Render() {
-    if (this->State == GameState::GAME_ACTIVE || this->State == GameState::GAME_OVER) {
+    if (this->state == GameState::GAME_ACTIVE || this->state == GameState::GAME_OVER) {
         // Draw play area with a frame
-        Renderer->DrawSprite(ResourceManager::GetTexture("solid"), glm::vec2(1.8 * CELL_SIZE),
-                             glm::vec2(10.4* CELL_SIZE, 24.4 * CELL_SIZE), 0.0f,
-                             flashTimer > 0.0f ? glm::vec3(1.0f, 0.0f, 0.0f) : glm::vec3(1.0f));
-        Renderer->DrawSprite(ResourceManager::GetTexture("solid"), glm::vec2(2 * CELL_SIZE),
-                             glm::vec2(10 * CELL_SIZE, 24 * CELL_SIZE), 0.0f, glm::vec3(0.0f));
+        renderer->DrawSprite(
+            ResourceManager::GetTexture("solid"), glm::vec2(1.8 * CELL_SIZE),
+            glm::vec2((colCellCount + borderCellRatio) * CELL_SIZE, (rowCellCount + borderCellRatio) * CELL_SIZE), 0.0f,
+            flashTimer > 0.0f ? glm::vec3(1.0f, 0.0f, 0.0f) : glm::vec3(1.0f));
+        renderer->DrawSprite(ResourceManager::GetTexture("solid"), glm::vec2(paddingCellRatio * CELL_SIZE),
+                             glm::vec2(colCellCount * CELL_SIZE, rowCellCount * CELL_SIZE), 0.0f, glm::vec3(0.0f));
 
         // Draw actual game
         for (int i = 0; i < 24; ++i) {
             for (int j = 0; j < 10; ++j) {
                 if (grid[i][j] != BlockColor::NONE) {
-                    Renderer->DrawSprite(ResourceManager::GetTexture("block"),
-                                         glm::vec2((j + 2) * CELL_SIZE, ((23 - i) + 2) * CELL_SIZE),
+                    renderer->DrawSprite(ResourceManager::GetTexture("block"),
+                                         glm::vec2((j + borderCellRatio) * CELL_SIZE,
+                                                   ((rowCellCount - 1 - i) + borderCellRatio) * CELL_SIZE),
                                          glm::vec2(CELL_SIZE), 0.0f, getColor(grid[i][j]));
                 }
             }
@@ -246,58 +253,58 @@ void Game::Render() {
 
         // Render current tetromino
 
-        BlockColor currTetrominoColor = static_cast<BlockColor>(static_cast<int>(CurrentTetromino->Type) +
+        BlockColor currTetrominoColor = static_cast<BlockColor>(static_cast<int>(currentTetromino->Type) +
                                                                 1); // Assign the Tetromino's color to the grid
-        for (auto block : CurrentTetromino->GetCurrentShape()) {
-            int gridX = static_cast<int>(CurrentTetromino->Position.x + block.x);
-            int gridY = static_cast<int>(CurrentTetromino->Position.y + block.y);
-            Renderer->DrawSprite(ResourceManager::GetTexture("block"),
+        for (auto block : currentTetromino->GetCurrentShape()) {
+            int gridX = static_cast<int>(currentTetromino->Position.x + block.x);
+            int gridY = static_cast<int>(currentTetromino->Position.y + block.y);
+            renderer->DrawSprite(ResourceManager::GetTexture("block"),
                                  glm::vec2((gridX + 2) * CELL_SIZE, ((23 - gridY) + 2) * CELL_SIZE),
                                  glm::vec2(CELL_SIZE), 0.0f, getColor(currTetrominoColor));
         }
 
-        // Render Score
-        Text->RenderText("Score: " + std::to_string(Score), 750.0f, 200.0f, 1.0f);
+        // Render score
+        text->RenderText("score: " + std::to_string(score), 750.0f, 200.0f, 1.0f);
 
         // Render next tetromino
 
-        BlockColor nextTetrominoColor = static_cast<BlockColor>(static_cast<int>(NextTetromino->Type) +
+        BlockColor nextTetrominoColor = static_cast<BlockColor>(static_cast<int>(nextTetromino->Type) +
                                                                 1); // Assign the Tetromino's color to the grid
-        Renderer->DrawSprite(ResourceManager::GetTexture("solid"), glm::vec2(620.0f, 390.0f), glm::vec2(260.0f), 0.0f,
+        renderer->DrawSprite(ResourceManager::GetTexture("solid"), glm::vec2(620.0f, 390.0f), glm::vec2(260.0f), 0.0f,
                              glm::vec3(1.0f));
-        Renderer->DrawSprite(ResourceManager::GetTexture("solid"), glm::vec2(630.0f, 400.0f), glm::vec2(240.0f), 0.0f,
+        renderer->DrawSprite(ResourceManager::GetTexture("solid"), glm::vec2(630.0f, 400.0f), glm::vec2(240.0f), 0.0f,
                              glm::vec3(0.0f));
 
-        for (auto block : NextTetromino->GetCurrentShape()) {
+        for (auto block : nextTetromino->GetCurrentShape()) {
             int posX = static_cast<int>(670.0f + block.x * 40.0f);
             int posY = static_cast<int>(480.0f + block.y * 40.0f);
             // Center the 3 wide piece
-            if (NextTetromino->Type != TetrominoType::I && NextTetromino->Type != TetrominoType::O) {
+            if (nextTetromino->Type != TetrominoType::I && nextTetromino->Type != TetrominoType::O) {
                 posX += 20.0f;
             }
-            Renderer->DrawSprite(ResourceManager::GetTexture("block"), glm::vec2(posX, posY), glm::vec2(40.0f), 0.0f,
+            renderer->DrawSprite(ResourceManager::GetTexture("block"), glm::vec2(posX, posY), glm::vec2(40.0f), 0.0f,
                                  getColor(nextTetrominoColor));
         }
 
-        if (this->State == GameState::GAME_OVER) {
-            Text->RenderText("GAME OVER", 500.0f, 500.0f, 2.0f, glm::vec3(0.8f));
+        if (this->state == GameState::GAME_OVER) {
+            text->RenderText("GAME OVER", 500.0f, 500.0f, 2.0f, glm::vec3(0.8f));
         }
 
-    } else if (this->State == GameState::GAME_MENU) {
-        Renderer->DrawSprite(ResourceManager::GetTexture("solid"), StartButton->Position, StartButton->Size, 0.0f,
+    } else if (this->state == GameState::GAME_MENU) {
+        renderer->DrawSprite(ResourceManager::GetTexture("solid"), startButton->Position, startButton->Size, 0.0f,
                              glm::vec3(1.0f));
-        Text->RenderText("TETRIS", 500.0f, 200.0f, 2.0f);
-        Text->RenderText("Start game", 500.0f, 500.0f, 0.5f, glm::vec3(0.0f));
+        text->RenderText("TETRIS", 500.0f, 200.0f, 2.0f);
+        text->RenderText("Start game", 500.0f, 500.0f, 0.5f, glm::vec3(0.0f));
     }
 }
 
 void Game::ResetGame() {
     // Clear the score and grid
-    this->Score = 0;
+    this->score = 0;
     for (int i = 0; i < 24; ++i) {
         for (int j = 0; j < 10; ++j) {
             grid[i][j] = BlockColor::NONE;
         }
     }
-    this->State = GameState::GAME_MENU;
+    this->state = GameState::GAME_MENU;
 }
