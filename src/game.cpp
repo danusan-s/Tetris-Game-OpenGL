@@ -26,7 +26,7 @@ Game::~Game() {
 }
 
 void Game::Init() {
-    CELL_SIZE = static_cast<float>(Height) / (rowCellCount+(2*paddingCellRatio));
+    CELL_SIZE = static_cast<float>(Height) / (rowCellCount + (2 * paddingCellRatio));
 
     // Seed the random number generator
     srand(static_cast<unsigned int>(time(0)));
@@ -54,7 +54,7 @@ void Game::Init() {
     SpawnTetromino();
 
     // add menu buttons
-    startButton = new ClickableObject(glm::vec2(500, 500), glm::vec2(500, 100), 0);
+    startButton = new ClickableObject(glm::vec2(Width * 0.5f), glm::vec2(Width * 0.5f, Width * 0.1f), 0);
 }
 
 // Spawn a random Tetromino at the top of the grid
@@ -261,37 +261,37 @@ void Game::Render() {
         }
 
         // Render Score
-        text->RenderText("Score: " + std::to_string(Score), 0.75f*Width, 0.2f*Height, 1.0f);
+        text->RenderText("Score: " + std::to_string(Score), 0.75f * Width, 0.2f * Height, 1.0f);
 
         // Render next tetromino
 
         BlockColor nextTetrominoColor = static_cast<BlockColor>(static_cast<int>(nextTetromino->Type) +
                                                                 1); // Assign the Tetromino's color to the grid
-        renderer->DrawSprite(ResourceManager::GetTexture("solid"), glm::vec2(620.0f, 390.0f), glm::vec2(260.0f), 0.0f,
-                             glm::vec3(1.0f));
-        renderer->DrawSprite(ResourceManager::GetTexture("solid"), glm::vec2(630.0f, 400.0f), glm::vec2(240.0f), 0.0f,
-                             glm::vec3(0.0f));
+        renderer->DrawSprite(ResourceManager::GetTexture("solid"), glm::vec2(0.62f * Width, 0.39f * Width),
+                             glm::vec2(0.26f * Width), 0.0f, glm::vec3(1.0f));
+        renderer->DrawSprite(ResourceManager::GetTexture("solid"), glm::vec2(0.63f * Width, 0.4f * Width),
+                             glm::vec2(0.24f * Width), 0.0f, glm::vec3(0.0f));
 
         for (auto block : nextTetromino->GetCurrentShape()) {
-            int posX = static_cast<int>(670.0f + block.x * 40.0f);
-            int posY = static_cast<int>(480.0f + block.y * 40.0f);
+            float posX = Width * (0.67f + block.x * 0.04f);
+            float posY = Width * (0.48f + block.y * 0.04f);
             // Center the 3 wide piece
             if (nextTetromino->Type != TetrominoType::I && nextTetromino->Type != TetrominoType::O) {
-                posX += 20.0f;
+                posX += 0.02f * Width;
             }
-            renderer->DrawSprite(ResourceManager::GetTexture("block"), glm::vec2(posX, posY), glm::vec2(40.0f), 0.0f,
-                                 getColor(nextTetrominoColor));
+            renderer->DrawSprite(ResourceManager::GetTexture("block"), glm::vec2(posX, posY), glm::vec2(0.04f * Width),
+                                 0.0f, getColor(nextTetrominoColor));
         }
 
         if (this->State == GameState::GAME_OVER) {
-            text->RenderText("GAME OVER", 0.5f*Width, 0.5f*Height, 2.0f, glm::vec3(0.8f));
+            text->RenderText("GAME OVER", 0.5f * Width, 0.5f * Height, 2.0f, glm::vec3(0.8f));
         }
 
     } else if (this->State == GameState::GAME_MENU) {
         renderer->DrawSprite(ResourceManager::GetTexture("solid"), startButton->Position, startButton->Size, 0.0f,
                              glm::vec3(1.0f));
-        text->RenderText("TETRIS", 0.5f*Width, 0.2*Height, 2.0f);
-        text->RenderText("Start game", 0.5f*Width, 0.5f*Width ,0.5f, glm::vec3(0.0f));
+        text->RenderText("TETRIS", 0.5f * Width, 0.2 * Height, 2.0f);
+        text->RenderText("Start game", 0.5f * Width, 0.5f * Width, 0.5f, glm::vec3(0.0f));
     }
 }
 

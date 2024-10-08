@@ -12,9 +12,10 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 
 // The Width of the screen
-const unsigned int SCREEN_WIDTH = 1000;
+// Modify only width if you want to change size
+const unsigned int SCREEN_WIDTH = 800;
 // The height of the screen
-const unsigned int SCREEN_HEIGHT = 1200;
+const unsigned int SCREEN_HEIGHT = 12.0*SCREEN_WIDTH/10.0;
 
 Game Tetris(SCREEN_WIDTH, SCREEN_HEIGHT);
 
