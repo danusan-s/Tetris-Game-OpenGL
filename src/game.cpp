@@ -2,19 +2,14 @@
 #include "resource_manager.h"
 #include <iostream>
 
-std::vector<std::vector<BlockColor>> grid(24, std::vector<BlockColor>(10, BlockColor::NONE));
-
 float fallTimeAccumulator = 0.0f;
 float moveTimeAccumulator = 0.0f;
 float flashTimer = 0.0f;
 
 Game::Game(unsigned int width, unsigned int height)
-    : State(GameState::GAME_MENU), Keys(), Width(width), Height(height), Score(0) {
-    int rowCellCount = 24;
-    int colCellCount = 10;
-    float borderCellRatio = 0.4f;
-    float paddingCellRatio = 2.0f;
-}
+    : State(GameState::GAME_MENU), Keys(), Width(width), Height(height), Score(0),
+      grid(std::vector<std::vector<BlockColor>>(24, std::vector<BlockColor>(10, BlockColor::NONE))), rowCellCount(24),
+      colCellCount(10), borderCellRatio(0.2f), paddingCellRatio(2.0f) {}
 
 Game::~Game() {
     std::cout << "Attempting to delete Game Object" << std::endl;
@@ -31,7 +26,7 @@ Game::~Game() {
 }
 
 void Game::Init() {
-    CELL_SIZE = Height / 28.0;
+    CELL_SIZE = static_cast<float>(Height) / rowCellCount+(2*paddingCellRatio);
 
     // Seed the random number generator
     srand(static_cast<unsigned int>(time(0)));
@@ -232,10 +227,12 @@ glm::vec3 getColor(BlockColor color) {
 void Game::Render() {
     if (this->State == GameState::GAME_ACTIVE || this->State == GameState::GAME_OVER) {
         // Draw play area with a frame
-        renderer->DrawSprite(
-            ResourceManager::GetTexture("solid"), glm::vec2(1.8 * CELL_SIZE),
-            glm::vec2((colCellCount + borderCellRatio) * CELL_SIZE, (rowCellCount + borderCellRatio) * CELL_SIZE), 0.0f,
-            flashTimer > 0.0f ? glm::vec3(1.0f, 0.0f, 0.0f) : glm::vec3(1.0f));
+        renderer->DrawSprite(ResourceManager::GetTexture("solid"),
+                             glm::vec2((paddingCellRatio - borderCellRatio) * CELL_SIZE),
+                             glm::vec2((colCellCount + 2 * borderCellRatio) * CELL_SIZE,
+                                       (rowCellCount + 2 * borderCellRatio) * CELL_SIZE),
+                             0.0f, flashTimer > 0.0f ? glm::vec3(1.0f, 0.0f, 0.0f) : glm::vec3(1.0f));
+
         renderer->DrawSprite(ResourceManager::GetTexture("solid"), glm::vec2(paddingCellRatio * CELL_SIZE),
                              glm::vec2(colCellCount * CELL_SIZE, rowCellCount * CELL_SIZE), 0.0f, glm::vec3(0.0f));
 
@@ -244,8 +241,8 @@ void Game::Render() {
             for (int j = 0; j < 10; ++j) {
                 if (grid[i][j] != BlockColor::NONE) {
                     renderer->DrawSprite(ResourceManager::GetTexture("block"),
-                                         glm::vec2((j + borderCellRatio) * CELL_SIZE,
-                                                   ((rowCellCount - 1 - i) + borderCellRatio) * CELL_SIZE),
+                                         glm::vec2((j + paddingCellRatio) * CELL_SIZE,
+                                                   ((rowCellCount - 1 - i) + paddingCellRatio) * CELL_SIZE),
                                          glm::vec2(CELL_SIZE), 0.0f, getColor(grid[i][j]));
                 }
             }
@@ -264,7 +261,7 @@ void Game::Render() {
         }
 
         // Render Score
-        text->RenderText("Score: " + std::to_string(Score), 750.0f, 200.0f, 1.0f);
+        text->RenderText("Score: " + std::to_string(Score), 0.75f*Width, 0.2f*Height, 1.0f);
 
         // Render next tetromino
 
@@ -287,14 +284,14 @@ void Game::Render() {
         }
 
         if (this->State == GameState::GAME_OVER) {
-            text->RenderText("GAME OVER", 500.0f, 500.0f, 2.0f, glm::vec3(0.8f));
+            text->RenderText("GAME OVER", 0.5f*Width, 0.5f*Height, 2.0f, glm::vec3(0.8f));
         }
 
     } else if (this->State == GameState::GAME_MENU) {
         renderer->DrawSprite(ResourceManager::GetTexture("solid"), startButton->Position, startButton->Size, 0.0f,
                              glm::vec3(1.0f));
-        text->RenderText("TETRIS", 500.0f, 200.0f, 2.0f);
-        text->RenderText("Start game", 500.0f, 500.0f, 0.5f, glm::vec3(0.0f));
+        text->RenderText("TETRIS", 0.5f*Width, 0.2*Height, 2.0f);
+        text->RenderText("Start game", 0.5f*Width, 0.5f*Width ,0.5f, glm::vec3(0.0f));
     }
 }
 

@@ -22,6 +22,7 @@ class Game {
     // Game-related State data
     SpriteRenderer* renderer;
     TextRenderer* text;
+    std::vector<std::vector<BlockColor>> grid;
     Tetromino* currentTetromino;
     Tetromino* nextTetromino;
     ClickableObject* startButton;
