@@ -13,7 +13,7 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 
 // The Width of the screen
 // Modify only width if you want to change size
-const unsigned int SCREEN_WIDTH = 800;
+const unsigned int SCREEN_WIDTH = 1000;
 // The height of the screen
 const unsigned int SCREEN_HEIGHT = 12.0*SCREEN_WIDTH/10.0;
 
