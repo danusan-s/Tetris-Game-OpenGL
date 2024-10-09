@@ -14,9 +14,7 @@ bool ClickableObject::CheckClickPos(float x, float y) {
     return (x < Position.x + Size.x && x > Position.x && y < Position.y + Size.y && y > Position.y);
 }
 
-void ClickableObject::ChangeScale(float scale){
-    Size = originalSize*scale;
-    Position = centerPosition - (Size*0.5f);
+void ClickableObject::ChangeScale(float scale) {
+    Size = originalSize * scale;
+    Position = centerPosition - (Size * 0.5f);
 }
-
-

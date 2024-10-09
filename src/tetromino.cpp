@@ -1,8 +1,7 @@
 #include "tetromino.h"
 
 // Constructor
-Tetromino::Tetromino(TetrominoType type)
-    : Type(type), RotationState(Rotation::DEG_0), Position(4, 22) {
+Tetromino::Tetromino(TetrominoType type) : Type(type), RotationState(Rotation::DEG_0), Position(4, 22) {
     InitShapeOffsets();
 }
 

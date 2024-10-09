@@ -9,7 +9,8 @@
 
 TextRenderer::TextRenderer(unsigned int width, unsigned int height) {
     // load and configure shader
-    this->TextShader = ResourceManager::LoadShader("../shaders/text_vertex.glsl", "../shaders/text_fragment.glsl", nullptr, "text");
+    this->TextShader =
+        ResourceManager::LoadShader("../shaders/text_vertex.glsl", "../shaders/text_fragment.glsl", nullptr, "text");
     this->TextShader.SetMatrix4("projection",
                                 glm::ortho(0.0f, static_cast<float>(width), static_cast<float>(height), 0.0f), true);
     this->TextShader.SetInteger("text", 0);
@@ -41,8 +42,7 @@ void TextRenderer::Load(std::string font, unsigned int fontSize) {
     // disable byte-alignment restriction
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     // then for the first 128 ASCII characters, pre-load/compile their characters and store them
-    for (GLubyte c = 0; c < 128; c++)
-    {
+    for (GLubyte c = 0; c < 128; c++) {
         // load character glyph
         if (FT_Load_Char(face, c, FT_LOAD_RENDER)) {
             std::cout << "ERROR::FREETYTPE: Failed to load Glyph" << std::endl;

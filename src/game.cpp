@@ -261,7 +261,7 @@ void Game::Render() {
         }
 
         // Render Score
-        text->RenderText("Score: " + std::to_string(Score), 0.75f * Width, 0.2f * Height,0.001f*Width);
+        text->RenderText("Score: " + std::to_string(Score), 0.75f * Width, 0.2f * Height, 0.001f * Width);
 
         // Render next tetromino
 
@@ -284,14 +284,14 @@ void Game::Render() {
         }
 
         if (this->State == GameState::GAME_OVER) {
-            text->RenderText("GAME OVER", 0.5f * Width, 0.5f * Height, Width*0.002f, glm::vec3(0.8f));
+            text->RenderText("GAME OVER", 0.5f * Width, 0.5f * Height, Width * 0.002f, glm::vec3(0.8f));
         }
 
     } else if (this->State == GameState::GAME_MENU) {
         renderer->DrawSprite(ResourceManager::GetTexture("solid"), startButton->Position, startButton->Size, 0.0f,
                              glm::vec3(1.0f));
-        text->RenderText("TETRIS", 0.5f * Width, 0.2 * Height, 0.002f*Width);
-        text->RenderText("Start game", 0.5f * Width, 0.5f * Width, 0.0005f*Width, glm::vec3(0.0f));
+        text->RenderText("TETRIS", 0.5f * Width, 0.2 * Height, 0.002f * Width);
+        text->RenderText("Start game", 0.5f * Width, 0.5f * Width, 0.0005f * Width, glm::vec3(0.0f));
     }
 }
 
